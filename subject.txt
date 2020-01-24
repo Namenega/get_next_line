@@ -1,0 +1,60 @@
+# **************************************************************************** #
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    subject.txt                                        :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: namenega <namenega@student.42.fr>          +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2020/01/23 13:41:34 by namenega          #+#    #+#              #
+#    Updated: 2020/01/23 18:53:18 by namenega         ###   ########.fr        #
+#                                                                              #
+# **************************************************************************** #
+
+fichiers de rendu 
+
+- get_next_line.c
+- get_next_line_utils.c
+- get_next_line.h
+
+
+valeur de retour
+
+- une ligne a ete lue : 1
+- la fin du fichier a ete atteinte : 0
+- erreur : -1
+
+
+fonctions autorisees
+
+- read (int fd, void *buf, size_t count)
+		-> lit jusque 'count' octets depuis fd dans le tampon BUFFER
+- malloc
+- free
+
+
+Description
+
+- ecrire une fonction qui retourne une ligne lue
+		depuis un file descriptor (fd), sans le retour a la ligne
+- des appels successifs a la fonction get_next_line doivent
+		permettre de lire l'entierete du texte disponible
+		sur le file descriptor, une ligne a la fois.
+
+
+
+
+-> libft non autorisee
+-> la "lib" = fichier get_next_line_utils.c
+-> la fonction doit bien se comporter si on lit le fichier
+		ou entree standard
+-> doit compiler avec le flag -D BUFFER SIZE=xx
+	-> gcc -Wall -Wextra -Werror -D BUFFER_SIZE=xx get_next_line.c
+		get_next_line_utils.c
+-> read DOIT utiliser le buffer_size pour lire depuis un fichier/stdin
+-> il faut le prototype dans le fichier header .h
+
+
+/!\ buffer size?
+
+- si \n, il faut renvoyer la ligne et arreter de lire
+		jusqu'au prochain appel
