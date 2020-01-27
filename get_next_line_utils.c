@@ -6,7 +6,7 @@
 /*   By: namenega <namenega@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/23 13:32:45 by namenega          #+#    #+#             */
-/*   Updated: 2020/01/24 15:20:44 by namenega         ###   ########.fr       */
+/*   Updated: 2020/01/27 21:41:26 by namenega         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ size_t	ft_strlen(const char *s)
 	return (i);
 }
 
-char	*ft_strdup(const char *s)
+char	*ft_strdup(char *s, char *reminder)
 {
 	char	*dst;
 	int		i;
@@ -38,6 +38,8 @@ char	*ft_strdup(const char *s)
 		i++;
 	}
 	dst[i] = '\0';
+	if (reminder)
+		free(reminder);
 	return (dst);
 }
 
@@ -51,7 +53,8 @@ char	*ft_strjoin(const char *s1, const char *s2)
 	j = 0;
 	if ((char *)s1 == '\0' || (char *)s2 == '\0')
 		return (0);
-	if (!(tab = (char *)malloc(sizeof(char *) * (ft_strlen(s1) + ft_strlen(s2) + 1))))
+	if (!(tab = (char *)malloc(sizeof(char *) *
+			(ft_strlen(s1) + ft_strlen(s2) + 1))))
 		return (NULL);
 	while (((char *)s1)[i] != '\0')
 	{
@@ -87,20 +90,17 @@ char	*ft_strchr(const char *s, int c)
 
 char	*ft_newstr(size_t size)
 {
-	unsigned char	*str;
-	int				i;
+	char	*new;
+	size_t	i;
 
 	i = 0;
-	str = malloc(size + 1);
-	if (str == NULL)
+	if (!(new = (char *)malloc(sizeof(char) * size + 1)))
 		return (NULL);
-	else
+	while (i < size)
 	{
-		while (i < size + 1)
-		{
-			str[i] = '\0';
-			i++;
-		}
-		return ((char *)str);
+		new[i] = '\0';
+		i++;
 	}
+	new[i] = '\0';
+	return (new);
 }
