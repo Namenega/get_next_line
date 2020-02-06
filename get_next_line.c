@@ -5,100 +5,87 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: namenega <namenega@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/01/23 13:24:05 by namenega          #+#    #+#             */
-/*   Updated: 2020/01/27 21:41:28 by namenega         ###   ########.fr       */
+/*   Created: 2020/02/05 04:22:54 by namenega          #+#    #+#             */
+/*   Updated: 2020/02/06 18:54:41 by namenega         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-int		ft_free_ret(char *str, char *s2, int ret)
-{
-	if (str)
-		free(str);
-	str = NULL;
-	if (s2)
-		free(s2);
-	s2 = NULL;
-	return (ret);
-}
+/*
+** cpyline = on copie statik dans line
+*/
 
-void	ft_strclr(char *s)
-{
-	int		len;
-
-	if (!s)
-		return ;
-	len = ft_strlen(s);
-	while (len >= 0)
-	{
-		s[len] = '\0';
-		len--;
-	}
-}
-
-char	*ft_strcpy(char *dest, char *str)
+static char	*ft_cpyline(char *statik)
 {
 	int		i;
+	char	*line;
 
-	while (str[i] != '\0')
+	i = 0;
+	while (statik && statik[i] && statik[i] != '\n')
+		i++;
+	if (!(line = (char *)malloc(sizeof(char) * (i + 1))))
+		return (NULL);
+	i = 0;
+	while (statik && statik[i] && statik[i] != '\n')
 	{
-		dest[i] = str[i];
+		line[i] = statik[i];
 		i++;
 	}
-	dest[i] = '\0';
-	return (dest);
+	line[i] = '\0';
+	return (line);
 }
 
-char	*check_reminder(char *reminder, char **line)
+/*
+** on ecrit la fin de la statik dans str (apres \n)
+*/
+
+static char	*ft_reline(char *s1, int *ret, int a)
 {
 	char	*str;
+	int		i;
 
-	str = NULL;
-	if (reminder)
-		if ((str = ft_strchr(reminder, '\n')))
-		{
-			*str = '\0';
-			if (!(*line = ft_strdup(reminder, NULL)))
-				return (NULL);
-			ft_strcpy(reminder, ++str);
-		}
-		else
-		{
-			if (!(*line = ft_strdup(reminder, NULL)))
-				return (NULL);
-			ft_strclr(reminder);
-		}
-	else
-		*line = ft_newstr(1);
+	*ret = 0;
+	if ((i = ft_endline(s1)) < 0)
+	{
+		if (i == -1)
+			free(s1);
+		return (0);
+	}
+	if (!(str = (char *)malloc(sizeof(char) * (ft_strlen(s1) - i + 1))))
+	{
+		*ret = -1;
+		free(s1);
+		return (0);
+	}
+	i++;
+	while (s1[i + a])
+	{
+		str[a] = s1[i + a];
+		a++;
+	}
+	str[a] = '\0';
+	free(s1);
 	return (str);
 }
 
-int		get_next_line(int fd, char **line)
+int			get_next_line(int fd, char **line)
 {
-	char		buff[BUFFER_SIZE > 0 ? BUFFER_SIZE + 1 : 0];
-	int			byte_was_read;
-	char		*str;
-	static char	*reminder;
-	char		*tmp;
+	char		buf[BUFFER_SIZE + 1];
+	static char	*statik[OPEN_MAX] = {0};
+	int			ret;
 
-	if (fd < 0 || line == NULL || BUFFER_SIZE < 1)
+	if (!line || BUFFER_SIZE <= 0 || read(fd, buf, 0) < 0)
 		return (-1);
-	str = check_reminder(reminder, line);
-	while ((!str && ((byte_was_read = read(fd, buff, BUFFER_SIZE)) != 0)))
-	{
-		buff[byte_was_read] = '\0';
-		if ((str = ft_strchr(buff, '\n')) != NULL)
-		{
-			*str = '\0';
-			str++;
-			if (!(reminder = ft_strdup(str, reminder)))
-				return (ft_free_ret(str, reminder, -1));
-		}
-		tmp = *line;
-		if (!(*line = ft_strjoin(*line, buff)) || byte_was_read < 0)
-			return (ft_free_ret(*line, NULL, -1));
-		free(tmp);
-	}
-	return ((byte_was_read || ft_strlen(*line)) ? 1 : 0);
+	*line = NULL;
+	ret = 0;
+	while (ft_endline(statik[fd]) < 0 && (ret = read(fd, buf, BUFFER_SIZE)))
+		if (!(statik[fd] = ft_strjoin_modified(statik[fd], buf, ret)))
+			return (-1);
+	if (!(*line = ft_cpyline(statik[fd])))
+		return (-1);
+	statik[fd] = ft_reline(statik[fd], &ret, 0);
+	if (!statik[fd])
+		return (ret);
+	return (1);
 }
